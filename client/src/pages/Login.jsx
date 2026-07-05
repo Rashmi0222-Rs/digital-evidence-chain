@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import API from "../services/api";
 import {
   LockKeyhole,
   ShieldCheck,
@@ -33,11 +33,10 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
-        email,
-        password
-      });
-
+      const res = await API.post("/auth/login", {
+  email,
+  password,
+});
       if (res.data.user.role !== role) {
         toast.error(
           `This account is registered as ${res.data.user.role}, not ${role}`
