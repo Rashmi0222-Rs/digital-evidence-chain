@@ -17,7 +17,7 @@ import {
   MapPin,
   ChevronUp
 } from "lucide-react";
-import axios from "axios";
+import API from "../services/api";
 import cyberHero from "../assets/Cyber-hero.png";
 
 function Landing() {
@@ -33,10 +33,10 @@ function Landing() {
   const [info, setInfo] = useState(null);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/public/stats")
-      .then((res) => setStats(res.data))
-      .catch((err) => console.log(err));
+   API
+  .get("/public/stats")
+  .then((res) => setStats(res.data))
+  .catch((err) => console.log(err));
   }, []);
 
   const features = [
