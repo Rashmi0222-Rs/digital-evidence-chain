@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import SearchModal from "./search/SearchModal";
 import toast from "react-hot-toast";
 import NotificationBell from "./NotificationBell";
+import { IMAGE_URL } from "../config/config";
 
 function Topbar({ refresh }) {
   const navigate = useNavigate();
@@ -14,13 +15,25 @@ function Topbar({ refresh }) {
   );
 
   useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("user") || "{}"));
+    const syncUser = () => {
+      setUser(JSON.parse(localStorage.getItem("user") || "{}"));
+    };
+
+    syncUser();
+
+    window.addEventListener("userUpdated", syncUser);
+    window.addEventListener("storage", syncUser);
+
+    return () => {
+      window.removeEventListener("userUpdated", syncUser);
+      window.removeEventListener("storage", syncUser);
+    };
   }, []);
 
   const avatarUrl = user?.avatar
     ? user.avatar.startsWith("http")
       ? user.avatar
-      : `http://localhost:5000/${user.avatar.replace(/\\/g, "/")}`
+      : `${IMAGE_URL}/${user.avatar.replace(/\\/g, "/")}`
     : "";
 
   useEffect(() => {
@@ -44,11 +57,8 @@ function Topbar({ refresh }) {
   return (
     <div className="relative overflow-visible mb-8 rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-6 shadow-2xl">
       <div className="flex flex-col lg:flex-row justify-between gap-5">
-
         <div>
-          <p className="text-cyan-300 font-bold mb-1">
-            SECURE WORKSPACE
-          </p>
+          <p className="text-cyan-300 font-bold mb-1">SECURE WORKSPACE</p>
 
           <h2 className="text-4xl font-extrabold">
             Welcome, {user?.name || "User"}
@@ -63,7 +73,6 @@ function Topbar({ refresh }) {
         </div>
 
         <div className="flex items-center gap-4">
-
           <button
             onClick={() => setOpenSearch(true)}
             className="w-[420px] flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/70 px-5 py-3 text-slate-400 hover:border-cyan-400 transition"
@@ -105,14 +114,10 @@ function Topbar({ refresh }) {
               </div>
             )}
           </div>
-
         </div>
       </div>
 
-      <SearchModal
-        open={openSearch}
-        onClose={() => setOpenSearch(false)}
-      />
+      <SearchModal open={openSearch} onClose={() => setOpenSearch(false)} />
     </div>
   );
 }

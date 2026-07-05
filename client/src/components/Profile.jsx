@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { User, Mail, ShieldCheck, LogOut, Lock, Camera } from "lucide-react";
 import API from "../services/api";
 import toast from "react-hot-toast";
+import { IMAGE_URL } from "../config/config";
 
 function Profile({ user, logout }) {
   const getStoredUser = () => JSON.parse(localStorage.getItem("user") || "{}");
@@ -16,12 +17,14 @@ function Profile({ user, logout }) {
   const [newPassword, setNewPassword] = useState("");
 
   const buildAvatarUrl = (path) => {
-    if (!path) return "";
-    const cleanPath = path.replace(/\\/g, "/");
-    return cleanPath.startsWith("http")
-      ? cleanPath
-      : `http://localhost:5000/${cleanPath}`;
-  };
+  if (!path) return "";
+
+  const cleanPath = path.replace(/\\/g, "/");
+
+  return cleanPath.startsWith("http")
+    ? cleanPath
+    : `${IMAGE_URL}/${cleanPath}`;
+};
 
   const avatarUrl = preview || buildAvatarUrl(avatar);
 
