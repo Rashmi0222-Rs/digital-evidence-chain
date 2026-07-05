@@ -18,7 +18,7 @@ import {
   ChevronUp
 } from "lucide-react";
 import axios from "axios";
-import cyberHero from "../assets/cyber-hero.png";
+import cyberHero from "../assets/Cyber-hero.png";
 
 function Landing() {
   const navigate = useNavigate();
