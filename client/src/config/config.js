@@ -4,3 +4,5 @@ export const API_URL =
 export const API_BASE = `${API_URL}/api`;
 
 export const IMAGE_URL = API_URL;
+
+console.log("API_URL:", API_URL);
