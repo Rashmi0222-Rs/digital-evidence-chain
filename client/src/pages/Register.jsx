@@ -60,10 +60,11 @@ function Register() {
 
     try {
       await API.post("/auth/register", {
-        name: form.name,
-        email: form.email,
-        password: form.password
-      });
+  name: form.name,
+  email: form.email,
+  password: form.password,
+  role: "user"
+});
 
       toast.success("Registration successful");
       navigate("/login");
