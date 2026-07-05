@@ -34,8 +34,9 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
+      "https://digital-evidence-chain-5kx2jt35p-sanjay-s-projects8.vercel.app",
       "https://digital-evidence-chain-du52uxzue-sanjay-s-projects8.vercel.app",
-      "https://digital-evidence-chain-5kx2jt35p-sanjay-s-projects8.vercel.app"
+      "https://digital-evidence-chain-kr9m6qs7b-sanjay-s-projects8.vercel.app"
     ],
     credentials: true
   })
