@@ -10,7 +10,7 @@ import {
   ShieldCheck,
   Home
 } from "lucide-react";
-import axios from "axios";
+import API from "../services/api";
 import toast from "react-hot-toast";
 
 import registerBg from "../assets/register-bg.png";
@@ -59,7 +59,7 @@ function Register() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/auth/register", {
+      await API.post("/auth/register", {
         name: form.name,
         email: form.email,
         password: form.password
