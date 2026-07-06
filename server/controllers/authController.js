@@ -9,11 +9,25 @@ const generateToken = (id, role) => {
   });
 };
 
+const cleanUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  avatar: user.avatar
+});
+
 exports.registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        message: "Please fill all required fields"
+      });
+    }
 
     if (!emailRegex.test(email)) {
       return res.status(400).json({
@@ -44,22 +58,25 @@ exports.registerUser = async (req, res) => {
       role: "user"
     });
 
-    await createNotification(
-      "New User Registered",
-      `${user.name} registered as ${user.role}`,
-      "success"
-    );
+    await createNotification({
+      title: "New User Registered",
+      message: `${user.name} registered as ${user.role}`,
+      type: "success",
+      role: "admin"
+    });
+
+    await createNotification({
+      title: "Welcome to CyberPortal",
+      message: "Your account has been created successfully.",
+      type: "success",
+      recipient: user._id,
+      role: "user"
+    });
 
     res.status(201).json({
       message: "User registered successfully",
       token: generateToken(user._id, user.role),
-     user: {
-  id: user._id,
-  name: user.name,
-  email: user.email,
-  role: user.role,
-  avatar: user.avatar
-}
+      user: cleanUser(user)
     });
   } catch (error) {
     res.status(500).json({
@@ -92,14 +109,8 @@ exports.loginUser = async (req, res) => {
     res.json({
       message: "Login successful",
       token: generateToken(user._id, user.role),
-     user: {
-  id: user._id,
-  name: user.name,
-  email: user.email,
-  role: user.role,
-  avatar: user.avatar
-}
-  });
+      user: cleanUser(user)
+    });
   } catch (error) {
     res.status(500).json({
       message: "Login failed",

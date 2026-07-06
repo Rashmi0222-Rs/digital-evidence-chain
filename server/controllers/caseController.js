@@ -5,19 +5,40 @@ exports.createCase = async (req, res) => {
   try {
     const { caseTitle, description, category } = req.body;
 
+    if (!caseTitle || !description || !category) {
+      return res.status(400).json({
+        message: "Please fill all case details"
+      });
+    }
+
     const newCase = await Case.create({
       caseTitle,
       description,
       category,
-      createdBy: req.user.id
+      createdBy: req.user._id || req.user.id
     });
 
-    // Create Notification
-    await createNotification(
-      "New Case Created",
-      `Case "${newCase.caseTitle}" has been created successfully.`,
-      "info"
-    );
+    await createNotification({
+      title: "Case Created",
+      message: `Your case "${newCase.caseTitle}" has been created successfully.`,
+      type: "success",
+      recipient: req.user._id || req.user.id,
+      role: "user"
+    });
+
+    await createNotification({
+      title: "New Case Created",
+      message: `${req.user.name} created case "${newCase.caseTitle}".`,
+      type: "info",
+      role: "admin"
+    });
+
+    await createNotification({
+      title: "New Case Available",
+      message: `Case "${newCase.caseTitle}" is available for review.`,
+      type: "info",
+      role: "verifier"
+    });
 
     res.status(201).json({
       message: "Case created successfully",
@@ -49,7 +70,7 @@ exports.getCases = async (req, res) => {
 exports.getMyCases = async (req, res) => {
   try {
     const cases = await Case.find({
-      createdBy: req.user.id
+      createdBy: req.user._id || req.user.id
     }).sort({
       createdAt: -1
     });
@@ -71,7 +92,7 @@ exports.updateCaseStatus = async (req, res) => {
       req.params.id,
       { status },
       { new: true }
-    );
+    ).populate("createdBy", "name email role");
 
     if (!updatedCase) {
       return res.status(404).json({
@@ -79,12 +100,20 @@ exports.updateCaseStatus = async (req, res) => {
       });
     }
 
-    // Create Notification
-    await createNotification(
-      "Case Status Updated",
-      `Case "${updatedCase.caseTitle}" status changed to "${status}".`,
-      "success"
-    );
+    await createNotification({
+      title: "Case Status Updated",
+      message: `Your case "${updatedCase.caseTitle}" status changed to "${status}".`,
+      type: "success",
+      recipient: updatedCase.createdBy?._id,
+      role: "user"
+    });
+
+    await createNotification({
+      title: "Case Status Updated",
+      message: `${req.user.name} updated "${updatedCase.caseTitle}" to "${status}".`,
+      type: "info",
+      role: "admin"
+    });
 
     res.json({
       message: "Case status updated successfully",

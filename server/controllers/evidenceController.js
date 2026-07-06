@@ -38,11 +38,27 @@ exports.uploadEvidence = async (req, res) => {
       remarks: `${req.file.originalname} uploaded and SHA-256 hash generated`
     });
 
-    await createNotification(
-      "Evidence Uploaded",
-      `${req.file.originalname} uploaded successfully.`,
-      "success"
-    );
+    await createNotification({
+  title: "Evidence Uploaded",
+  message: `${req.file.originalname} uploaded successfully.`,
+  type: "success",
+  recipient: req.user._id || req.user.id,
+  role: "user"
+});
+
+await createNotification({
+  title: "New Evidence Submitted",
+  message: `${req.user.name} uploaded evidence "${req.file.originalname}".`,
+  type: "info",
+  role: "admin"
+});
+
+await createNotification({
+  title: "Evidence Waiting for Verification",
+  message: `${req.file.originalname} requires verification.`,
+  type: "warning",
+  role: "verifier"
+});
 
     res.status(201).json({
       message: "Evidence uploaded successfully",
@@ -116,15 +132,29 @@ exports.verifyEvidence = async (req, res) => {
           : "Uploaded file hash did not match with original evidence hash"
     });
 
-    await createNotification(
-      status === "verified" ? "Evidence Verified" : "Tampered Evidence Detected",
-      `${evidence.originalName} ${
-        status === "verified"
-          ? "hash matched successfully."
-          : "hash mismatch detected."
-      }`,
-      status === "verified" ? "success" : "error"
-    );
+   await createNotification({
+  title:
+    status === "verified"
+      ? "Evidence Verified"
+      : "Evidence Tampered",
+  message:
+    status === "verified"
+      ? `${evidence.originalName} has been verified successfully.`
+      : `${evidence.originalName} failed verification.`,
+  type: status === "verified" ? "success" : "error",
+  recipient: evidence.uploadedBy,
+  role: "user"
+});
+
+await createNotification({
+  title:
+    status === "verified"
+      ? "Evidence Verified"
+      : "Tampered Evidence",
+  message: `${req.user.name} completed verification for "${evidence.originalName}".`,
+  type: status === "verified" ? "success" : "error",
+  role: "admin"
+});
 
     res.json({
       message:

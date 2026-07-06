@@ -1,13 +1,20 @@
 const Notification = require("../models/Notification");
 
-// Get all notifications
+// Get role-based notifications
 exports.getNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.find()
-      .sort({ createdAt: -1 });
+    const userId = req.user._id;
+    const role = req.user.role;
+
+    const notifications = await Notification.find({
+      $or: [
+        { recipient: userId },
+        { role: role },
+        { role: "all" }
+      ]
+    }).sort({ createdAt: -1 });
 
     res.json(notifications);
-
   } catch (err) {
     res.status(500).json({
       message: "Failed to fetch notifications",
@@ -22,7 +29,6 @@ exports.createNotification = async (req, res) => {
     const notification = await Notification.create(req.body);
 
     res.status(201).json(notification);
-
   } catch (err) {
     res.status(500).json({
       message: "Failed to create notification",
@@ -43,11 +49,9 @@ exports.markRead = async (req, res) => {
     }
 
     notification.read = true;
-
     await notification.save();
 
     res.json(notification);
-
   } catch (err) {
     res.status(500).json({
       message: "Unable to update notification",
@@ -72,7 +76,6 @@ exports.deleteNotification = async (req, res) => {
     res.json({
       message: "Notification removed successfully"
     });
-
   } catch (err) {
     res.status(500).json({
       message: "Unable to delete notification",
@@ -81,15 +84,23 @@ exports.deleteNotification = async (req, res) => {
   }
 };
 
-// Clear all notifications
+// Clear only current user's visible notifications
 exports.clearAll = async (req, res) => {
   try {
-    await Notification.deleteMany({});
+    const userId = req.user._id;
+    const role = req.user.role;
 
-    res.json({
-      message: "All notifications cleared successfully"
+    await Notification.deleteMany({
+      $or: [
+        { recipient: userId },
+        { role: role },
+        { role: "all" }
+      ]
     });
 
+    res.json({
+      message: "Notifications cleared successfully"
+    });
   } catch (err) {
     res.status(500).json({
       message: "Unable to clear notifications",

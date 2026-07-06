@@ -9,14 +9,21 @@ const {
   clearAll
 } = require("../controllers/notificationController");
 
-router.get("/", getNotifications);
+const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 
-router.post("/", createNotification);
+// Get notifications for logged-in user
+router.get("/", protect, getNotifications);
 
-router.put("/:id", markRead);
+// Only Admin can manually create system notifications
+router.post("/", protect, authorizeRoles("admin"), createNotification);
 
-router.delete("/:id", deleteNotification);
+// Mark notification as read
+router.put("/:id", protect, markRead);
 
-router.delete("/", clearAll);
+// Delete notification
+router.delete("/:id", protect, deleteNotification);
+
+// Clear notifications visible to logged-in user
+router.delete("/", protect, clearAll);
 
 module.exports = router;

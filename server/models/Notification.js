@@ -14,19 +14,22 @@ const notificationSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: [
-        "success",
-        "warning",
-        "error",
-        "info"
-      ],
+      enum: ["success", "warning", "error", "info"],
       default: "info"
     },
 
+    // Personal notification
     recipient: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null
+    },
+
+    // Role notification
+    role: {
+      type: String,
+      enum: ["admin", "verifier", "user", "all"],
+      default: "all"
     },
 
     read: {
@@ -39,7 +42,4 @@ const notificationSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model(
-  "Notification",
-  notificationSchema
-);
+module.exports = mongoose.model("Notification", notificationSchema);

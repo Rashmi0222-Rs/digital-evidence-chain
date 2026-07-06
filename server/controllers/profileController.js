@@ -61,11 +61,13 @@ exports.updateProfile = async (req, res) => {
 
     await user.save();
 
-    await createNotification(
-      "Profile Updated",
-      `${user.name} updated profile information.`,
-      "info"
-    );
+    await createNotification({
+      title: "Profile Updated",
+      message: "Your profile information was updated successfully.",
+      type: "info",
+      recipient: user._id,
+      role: user.role
+    });
 
     res.json({
       message: "Profile updated successfully",
@@ -110,11 +112,13 @@ exports.changePassword = async (req, res) => {
 
     await user.save();
 
-    await createNotification(
-      "Password Changed",
-      `${user.name} changed account password.`,
-      "warning"
-    );
+    await createNotification({
+      title: "Password Changed",
+      message: "Your account password was changed successfully.",
+      type: "warning",
+      recipient: user._id,
+      role: user.role
+    });
 
     res.json({
       message: "Password updated successfully"
