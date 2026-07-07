@@ -3,7 +3,7 @@ import { Upload } from "lucide-react";
 import API from "../services/api";
 import toast from "react-hot-toast";
 
-function UploadEvidence({ cases, refresh }) {
+function UploadEvidence({ cases = [], refresh }) {
   const [caseId, setCaseId] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -34,7 +34,6 @@ function UploadEvidence({ cases, refresh }) {
       setCaseId("");
       setFile(null);
 
-      // Clear file input
       document.getElementById("evidenceFile").value = "";
 
       refresh();
@@ -51,18 +50,19 @@ function UploadEvidence({ cases, refresh }) {
   return (
     <form
       onSubmit={uploadEvidence}
-      className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-6 mb-8 shadow-2xl"
+      className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-4 md:p-6 mb-8 shadow-2xl"
     >
-      <h3 className="text-2xl font-bold mb-5 flex items-center gap-2">
-        <Upload /> Upload Evidence
+      <h3 className="text-xl md:text-2xl font-bold mb-5 flex items-center gap-2">
+        <Upload />
+        Upload Evidence
       </h3>
 
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
         <select
           value={caseId}
           onChange={(e) => setCaseId(e.target.value)}
-          className="rounded-xl bg-slate-950 border border-white/10 px-4 py-3"
+          className="w-full rounded-xl bg-slate-950 border border-white/10 px-4 py-3 outline-none focus:border-cyan-400"
         >
           <option value="">Select Case</option>
 
@@ -77,12 +77,12 @@ function UploadEvidence({ cases, refresh }) {
           id="evidenceFile"
           type="file"
           onChange={(e) => setFile(e.target.files[0])}
-          className="rounded-xl bg-slate-950 border border-white/10 px-4 py-3"
+          className="w-full rounded-xl bg-slate-950 border border-white/10 px-4 py-3 file:mr-4 file:rounded-lg file:border-0 file:bg-cyan-500/20 file:px-4 file:py-2 file:text-cyan-300 file:cursor-pointer"
         />
 
         <button
           disabled={loading}
-          className="rounded-xl bg-gradient-to-r from-purple-500 to-cyan-400 font-bold disabled:opacity-60"
+          className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-cyan-400 py-3 font-bold hover:scale-[1.02] transition disabled:opacity-60"
         >
           {loading ? "Uploading..." : "Upload Evidence"}
         </button>

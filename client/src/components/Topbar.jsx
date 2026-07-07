@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import SearchModal from "./search/SearchModal";
 import toast from "react-hot-toast";
@@ -55,16 +55,18 @@ function Topbar({ refresh }) {
   };
 
   return (
-    <div className="relative overflow-visible mb-8 rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-6 shadow-2xl">
-      <div className="flex flex-col lg:flex-row justify-between gap-5">
-        <div>
-          <p className="text-cyan-300 font-bold mb-1">SECURE WORKSPACE</p>
+    <div className="relative overflow-visible mb-6 md:mb-8 rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-4 md:p-6 shadow-2xl">
+      <div className="flex flex-col xl:flex-row justify-between gap-5">
+        <div className="min-w-0">
+          <p className="text-cyan-300 font-bold mb-1 text-xs md:text-base">
+            SECURE WORKSPACE
+          </p>
 
-          <h2 className="text-4xl font-extrabold">
+          <h2 className="text-2xl md:text-4xl font-extrabold break-words">
             Welcome, {user?.name || "User"}
           </h2>
 
-          <p className="text-slate-400 mt-2">
+          <p className="text-slate-400 mt-2 text-sm md:text-base">
             Logged in as{" "}
             <span className="text-purple-300 capitalize font-bold">
               {user?.role}
@@ -72,10 +74,10 @@ function Topbar({ refresh }) {
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3 md:gap-4">
           <button
             onClick={() => setOpenSearch(true)}
-            className="w-[420px] flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/70 px-5 py-3 text-slate-400 hover:border-cyan-400 transition"
+            className="hidden lg:flex w-[360px] xl:w-[420px] items-center justify-between rounded-2xl border border-white/10 bg-slate-950/70 px-5 py-3 text-slate-400 hover:border-cyan-400 transition"
           >
             <div className="flex items-center gap-3">
               🔍
@@ -87,14 +89,22 @@ function Topbar({ refresh }) {
             </kbd>
           </button>
 
+          <button
+            onClick={() => setOpenSearch(true)}
+            className="lg:hidden rounded-2xl bg-slate-950/70 border border-white/10 p-3 text-cyan-300"
+            title="Search"
+          >
+            <Search size={20} />
+          </button>
+
           <NotificationBell />
 
           <button
             onClick={handleRefresh}
-            className="rounded-2xl bg-cyan-500/20 border border-cyan-400/30 px-5 py-3 text-cyan-300 font-bold flex items-center gap-2 hover:bg-cyan-500/30 transition"
+            className="rounded-2xl bg-cyan-500/20 border border-cyan-400/30 px-4 md:px-5 py-3 text-cyan-300 font-bold flex items-center gap-2 hover:bg-cyan-500/30 transition text-sm md:text-base"
           >
             <ShieldCheck size={18} />
-            Refresh
+            <span className="hidden sm:inline">Refresh</span>
           </button>
 
           <div
@@ -106,10 +116,10 @@ function Topbar({ refresh }) {
               <img
                 src={avatarUrl}
                 alt="Profile"
-                className="h-14 w-14 rounded-full object-cover border-2 border-cyan-400 shadow-lg"
+                className="h-12 w-12 md:h-14 md:w-14 rounded-full object-cover border-2 border-cyan-400 shadow-lg"
               />
             ) : (
-              <div className="h-14 w-14 rounded-full bg-gradient-to-r from-purple-500 to-cyan-400 flex items-center justify-center text-xl font-bold text-white">
+              <div className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-gradient-to-r from-purple-500 to-cyan-400 flex items-center justify-center text-lg md:text-xl font-bold text-white">
                 {(user?.name || "U").charAt(0).toUpperCase()}
               </div>
             )}

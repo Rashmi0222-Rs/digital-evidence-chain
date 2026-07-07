@@ -34,16 +34,24 @@ function Sidebar({ role, logout }) {
 
   return (
     <aside
-      className={`relative hidden md:flex flex-col bg-slate-950/90 border-r border-cyan-400/10 backdrop-blur-xl transition-all duration-300 shadow-2xl ${
+      className={`flex flex-col h-screen bg-slate-950/95 border-r border-cyan-400/10 backdrop-blur-xl transition-all duration-300 shadow-2xl ${
         collapsed ? "w-24" : "w-72"
       }`}
     >
       <div className="p-6">
-        <SidebarToggle collapsed={collapsed} setCollapsed={setCollapsed} />
+
+        {/* Hide collapse button on mobile */}
+        <div className="hidden md:block">
+          <SidebarToggle
+            collapsed={collapsed}
+            setCollapsed={setCollapsed}
+          />
+        </div>
 
         <SidebarLogo collapsed={collapsed} />
 
         <div className="space-y-2 mt-8">
+
           {menu.map(([name, path, Icon]) => (
             <NavLink
               key={name}
@@ -59,13 +67,21 @@ function Sidebar({ role, logout }) {
               }
             >
               <Icon size={22} />
-              {!collapsed && <span className="font-medium">{name}</span>}
+
+              {!collapsed && (
+                <span className="font-medium">
+                  {name}
+                </span>
+              )}
             </NavLink>
           ))}
+
         </div>
+
       </div>
 
       <div className="mt-auto p-6">
+
         <SidebarProfile collapsed={collapsed} />
 
         <button
@@ -75,9 +91,12 @@ function Sidebar({ role, logout }) {
           } rounded-2xl bg-red-500/10 hover:bg-red-500/20 text-red-300 p-4 transition`}
         >
           <LogOut size={20} />
+
           {!collapsed && "Logout"}
         </button>
+
       </div>
+
     </aside>
   );
 }

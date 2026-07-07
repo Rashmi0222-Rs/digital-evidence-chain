@@ -17,14 +17,13 @@ function Profile({ user, logout }) {
   const [newPassword, setNewPassword] = useState("");
 
   const buildAvatarUrl = (path) => {
-  if (!path) return "";
+    if (!path) return "";
+    const cleanPath = path.replace(/\\/g, "/");
 
-  const cleanPath = path.replace(/\\/g, "/");
-
-  return cleanPath.startsWith("http")
-    ? cleanPath
-    : `${IMAGE_URL}/${cleanPath}`;
-};
+    return cleanPath.startsWith("http")
+      ? cleanPath
+      : `${IMAGE_URL}/${cleanPath}`;
+  };
 
   const avatarUrl = preview || buildAvatarUrl(avatar);
 
@@ -59,13 +58,13 @@ function Profile({ user, logout }) {
       formData.append("avatar", avatarFile);
 
       const res = await API.post("/avatar", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       const updatedUser = {
         ...localUser,
         ...res.data.user,
-        avatar: res.data.user?.avatar || res.data.avatar || ""
+        avatar: res.data.user?.avatar || res.data.avatar || "",
       };
 
       localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -95,7 +94,7 @@ function Profile({ user, logout }) {
       const updatedUser = {
         ...localUser,
         ...res.data.user,
-        avatar: localUser.avatar || res.data.user?.avatar || ""
+        avatar: localUser.avatar || res.data.user?.avatar || "",
       };
 
       localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -122,7 +121,7 @@ function Profile({ user, logout }) {
     try {
       await API.put("/profile/password", {
         currentPassword,
-        newPassword
+        newPassword,
       });
 
       toast.success("Password updated successfully");
@@ -134,13 +133,13 @@ function Profile({ user, logout }) {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-6">
-        <h3 className="text-2xl font-bold mb-5 flex items-center gap-2">
+    <div className="space-y-6 md:space-y-8">
+      <div className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-4 md:p-6">
+        <h3 className="text-xl md:text-2xl font-bold mb-5 flex items-center gap-2">
           <User /> Profile & Settings
         </h3>
 
-        <div className="grid md:grid-cols-5 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5">
           <div className="rounded-2xl bg-slate-950/70 border border-white/10 p-5 flex flex-col items-center justify-center">
             {avatarUrl ? (
               <img
@@ -157,23 +156,11 @@ function Profile({ user, logout }) {
             <p className="text-slate-400 text-sm">Profile Picture</p>
           </div>
 
-          <div className="rounded-2xl bg-slate-950/70 border border-white/10 p-5">
-            <User className="text-cyan-300 mb-3" />
-            <p className="text-slate-400 text-sm">Name</p>
-            <h4 className="font-bold">{localUser?.name}</h4>
-          </div>
+          <InfoCard icon={<User className="text-cyan-300 mb-3" />} title="Name" value={localUser?.name} />
 
-          <div className="rounded-2xl bg-slate-950/70 border border-white/10 p-5">
-            <Mail className="text-purple-300 mb-3" />
-            <p className="text-slate-400 text-sm">Email</p>
-            <h4 className="font-bold break-all">{localUser?.email}</h4>
-          </div>
+          <InfoCard icon={<Mail className="text-purple-300 mb-3" />} title="Email" value={localUser?.email} breakText />
 
-          <div className="rounded-2xl bg-slate-950/70 border border-white/10 p-5">
-            <ShieldCheck className="text-green-300 mb-3" />
-            <p className="text-slate-400 text-sm">Role</p>
-            <h4 className="font-bold capitalize">{localUser?.role}</h4>
-          </div>
+          <InfoCard icon={<ShieldCheck className="text-green-300 mb-3" />} title="Role" value={localUser?.role} capitalize />
 
           <button
             onClick={logout}
@@ -188,21 +175,21 @@ function Profile({ user, logout }) {
 
       <form
         onSubmit={uploadAvatar}
-        className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-6"
+        className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-4 md:p-6"
       >
-        <h3 className="text-2xl font-bold mb-5 flex items-center gap-2">
+        <h3 className="text-xl md:text-2xl font-bold mb-5 flex items-center gap-2">
           <Camera /> Upload Profile Picture
         </h3>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className="rounded-xl bg-slate-950 border border-white/10 px-4 py-3"
+            className="w-full rounded-xl bg-slate-950 border border-white/10 px-4 py-3 file:mr-4 file:rounded-lg file:border-0 file:bg-cyan-500/20 file:px-4 file:py-2 file:text-cyan-300"
           />
 
-          <button className="rounded-xl bg-gradient-to-r from-purple-500 to-cyan-400 font-bold">
+          <button className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-cyan-400 py-3 font-bold">
             Upload Avatar
           </button>
         </div>
@@ -210,28 +197,28 @@ function Profile({ user, logout }) {
 
       <form
         onSubmit={updateProfile}
-        className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-6"
+        className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-4 md:p-6"
       >
-        <h3 className="text-2xl font-bold mb-5 flex items-center gap-2">
+        <h3 className="text-xl md:text-2xl font-bold mb-5 flex items-center gap-2">
           <User /> Update Profile
         </h3>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input
-            className="rounded-xl bg-slate-950 border border-white/10 px-4 py-3 outline-none"
+            className="w-full rounded-xl bg-slate-950 border border-white/10 px-4 py-3 outline-none"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="New name"
           />
 
           <input
-            className="rounded-xl bg-slate-950 border border-white/10 px-4 py-3 outline-none"
+            className="w-full rounded-xl bg-slate-950 border border-white/10 px-4 py-3 outline-none"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="New email"
           />
 
-          <button className="rounded-xl bg-gradient-to-r from-purple-500 to-cyan-400 font-bold">
+          <button className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-cyan-400 py-3 font-bold">
             Save Profile
           </button>
         </div>
@@ -239,16 +226,16 @@ function Profile({ user, logout }) {
 
       <form
         onSubmit={changePassword}
-        className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-6"
+        className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-4 md:p-6"
       >
-        <h3 className="text-2xl font-bold mb-5 flex items-center gap-2">
+        <h3 className="text-xl md:text-2xl font-bold mb-5 flex items-center gap-2">
           <Lock /> Change Password
         </h3>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input
             type="password"
-            className="rounded-xl bg-slate-950 border border-white/10 px-4 py-3 outline-none"
+            className="w-full rounded-xl bg-slate-950 border border-white/10 px-4 py-3 outline-none"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
             placeholder="Current password"
@@ -256,17 +243,33 @@ function Profile({ user, logout }) {
 
           <input
             type="password"
-            className="rounded-xl bg-slate-950 border border-white/10 px-4 py-3 outline-none"
+            className="w-full rounded-xl bg-slate-950 border border-white/10 px-4 py-3 outline-none"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             placeholder="New password"
           />
 
-          <button className="rounded-xl bg-gradient-to-r from-green-500 to-cyan-400 font-bold">
+          <button className="w-full rounded-xl bg-gradient-to-r from-green-500 to-cyan-400 py-3 font-bold">
             Update Password
           </button>
         </div>
       </form>
+    </div>
+  );
+}
+
+function InfoCard({ icon, title, value, breakText, capitalize }) {
+  return (
+    <div className="rounded-2xl bg-slate-950/70 border border-white/10 p-5">
+      {icon}
+      <p className="text-slate-400 text-sm">{title}</p>
+      <h4
+        className={`font-bold ${breakText ? "break-all" : ""} ${
+          capitalize ? "capitalize" : ""
+        }`}
+      >
+        {value || "N/A"}
+      </h4>
     </div>
   );
 }

@@ -9,7 +9,7 @@ import {
   Cell,
 } from "recharts";
 
-function VerificationTrend({ evidence }) {
+function VerificationTrend({ evidence = [] }) {
   const verified = evidence.filter(
     (e) => e.status === "verified"
   ).length;
@@ -41,55 +41,68 @@ function VerificationTrend({ evidence }) {
   ];
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-6 shadow-xl">
+    <div className="rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-4 md:p-6 shadow-xl">
 
-      <h3 className="text-2xl font-bold mb-6">
+      <h3 className="text-xl md:text-2xl font-bold mb-6">
         Verification Trend
       </h3>
 
-      <ResponsiveContainer width="100%" height={320}>
-        <BarChart
-          layout="vertical"
-          data={data}
-        >
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="#334155"
-          />
+      <div className="w-full h-[260px] md:h-[340px]">
 
-          <XAxis
-            type="number"
-            stroke="#cbd5e1"
-          />
-
-          <YAxis
-            dataKey="status"
-            type="category"
-            stroke="#cbd5e1"
-          />
-
-          <Tooltip
-            contentStyle={{
-              background: "#0f172a",
-              border: "1px solid #334155",
-              borderRadius: "15px",
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            layout="vertical"
+            data={data}
+            margin={{
+              top: 10,
+              right: 20,
+              left: 10,
+              bottom: 10,
             }}
-          />
-
-          <Bar
-            dataKey="value"
-            radius={[0, 10, 10, 0]}
           >
-            {data.map((entry, index) => (
-              <Cell
-                key={index}
-                fill={entry.color}
-              />
-            ))}
-          </Bar>
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#334155"
+            />
 
-        </BarChart>
-      </ResponsiveContainer>
+            <XAxis
+              type="number"
+              stroke="#cbd5e1"
+              tick={{ fontSize: 12 }}
+            />
+
+            <YAxis
+              type="category"
+              dataKey="status"
+              stroke="#cbd5e1"
+              tick={{ fontSize: 12 }}
+              width={80}
+            />
+
+            <Tooltip
+              contentStyle={{
+                background: "#0f172a",
+                border: "1px solid #334155",
+                borderRadius: "12px",
+              }}
+            />
+
+            <Bar
+              dataKey="value"
+              radius={[0, 10, 10, 0]}
+            >
+              {data.map((item, index) => (
+                <Cell
+                  key={index}
+                  fill={item.color}
+                />
+              ))}
+            </Bar>
+
+          </BarChart>
+        </ResponsiveContainer>
+
+      </div>
 
     </div>
   );
