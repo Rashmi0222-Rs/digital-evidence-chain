@@ -5,27 +5,31 @@ const PasswordReset = require("../models/PasswordReset");
 
 const sendMail = async (email, otp) => {
   const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  family: 4,
-  connectionTimeout: 30000,
-  greetingTimeout: 30000,
-  socketTimeout: 30000,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+    host: process.env.EMAIL_HOST,
+    port: Number(process.env.EMAIL_PORT) || 587,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+
+  await transporter.verify();
+
   return transporter.sendMail({
     from: `"CyberPortal" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "CyberPortal Password Reset OTP",
     html: `
-      <h2>Password Reset Request</h2>
-      <p>Your OTP is:</p>
-      <h1>${otp}</h1>
-      <p>This OTP expires in 10 minutes.</p>
+      <div style="font-family:Arial,sans-serif;padding:20px">
+        <h2>Password Reset Request</h2>
+        <p>Your One-Time Password (OTP) is:</p>
+        <h1 style="color:#2563eb">${otp}</h1>
+        <p>This OTP is valid for <b>10 minutes</b>.</p>
+        <p>If you did not request this, please ignore this email.</p>
+        <hr />
+        <p>Digital Evidence Chain System</p>
+      </div>
     `
   });
 };
@@ -35,13 +39,21 @@ exports.sendOtp = async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+      return res.status(400).json({
+        message: "Email is required"
+      });
     }
 
     console.log("OTP request received for:", email);
 
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.error("Missing EMAIL_USER or EMAIL_PASS");
+    if (
+      !process.env.EMAIL_HOST ||
+      !process.env.EMAIL_PORT ||
+      !process.env.EMAIL_USER ||
+      !process.env.EMAIL_PASS
+    ) {
+      console.error("Missing email environment variables");
+
       return res.status(500).json({
         message: "Email service is not configured"
       });
@@ -86,6 +98,12 @@ exports.resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
 
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({
+        message: "Please fill all fields"
+      });
+    }
+
     const record = await PasswordReset.findOne({ email, otp });
 
     if (!record) {
@@ -95,6 +113,8 @@ exports.resetPassword = async (req, res) => {
     }
 
     if (record.expiresAt < Date.now()) {
+      await PasswordReset.deleteMany({ email });
+
       return res.status(400).json({
         message: "OTP expired"
       });
@@ -107,6 +127,12 @@ exports.resetPassword = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found"
+      });
+    }
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
