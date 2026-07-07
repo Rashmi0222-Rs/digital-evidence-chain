@@ -6,14 +6,17 @@ const PasswordReset = require("../models/PasswordReset");
 const sendMail = async (email, otp) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS
     }
   });
 
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+  return transporter.sendMail({
+    from: `"CyberPortal" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "CyberPortal Password Reset OTP",
     html: `
@@ -28,6 +31,19 @@ const sendMail = async (email, otp) => {
 exports.sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    console.log("OTP request received for:", email);
+
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.error("Missing EMAIL_USER or EMAIL_PASS");
+      return res.status(500).json({
+        message: "Email service is not configured"
+      });
+    }
 
     const user = await User.findOne({ email });
 
@@ -49,10 +65,14 @@ exports.sendOtp = async (req, res) => {
 
     await sendMail(email, otp);
 
+    console.log("OTP sent successfully to:", email);
+
     res.json({
       message: "OTP sent to your email"
     });
   } catch (err) {
+    console.error("OTP SEND ERROR:", err);
+
     res.status(500).json({
       message: "Unable to send OTP",
       error: err.message
@@ -95,6 +115,8 @@ exports.resetPassword = async (req, res) => {
       message: "Password reset successful"
     });
   } catch (err) {
+    console.error("PASSWORD RESET ERROR:", err);
+
     res.status(500).json({
       message: "Password reset failed",
       error: err.message
