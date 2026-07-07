@@ -1,37 +1,42 @@
 const bcrypt = require("bcryptjs");
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 const User = require("../models/User");
 const PasswordReset = require("../models/PasswordReset");
 
 const sendMail = async (email, otp) => {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: Number(process.env.EMAIL_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
+  return axios.post(
+    "https://api.brevo.com/v3/smtp/email",
+    {
+      sender: {
+        name: "CyberPortal",
+        email: process.env.EMAIL_FROM
+      },
+      to: [
+        {
+          email: email
+        }
+      ],
+      subject: "CyberPortal Password Reset OTP",
+      htmlContent: `
+        <div style="font-family:Arial,sans-serif;padding:20px">
+          <h2>Password Reset Request</h2>
+          <p>Your One-Time Password (OTP) is:</p>
+          <h1 style="color:#2563eb">${otp}</h1>
+          <p>This OTP is valid for <b>10 minutes</b>.</p>
+          <p>If you did not request this, please ignore this email.</p>
+          <hr />
+          <p>Digital Evidence Chain System</p>
+        </div>
+      `
+    },
+    {
+      headers: {
+        "api-key": process.env.BREVO_API_KEY,
+        "Content-Type": "application/json"
+      },
+      timeout: 15000
     }
-  });
-
-  await transporter.verify();
-
-  return transporter.sendMail({
-    from: `"CyberPortal" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: "CyberPortal Password Reset OTP",
-    html: `
-      <div style="font-family:Arial,sans-serif;padding:20px">
-        <h2>Password Reset Request</h2>
-        <p>Your One-Time Password (OTP) is:</p>
-        <h1 style="color:#2563eb">${otp}</h1>
-        <p>This OTP is valid for <b>10 minutes</b>.</p>
-        <p>If you did not request this, please ignore this email.</p>
-        <hr />
-        <p>Digital Evidence Chain System</p>
-      </div>
-    `
-  });
+  );
 };
 
 exports.sendOtp = async (req, res) => {
@@ -44,18 +49,9 @@ exports.sendOtp = async (req, res) => {
       });
     }
 
-    console.log("OTP request received for:", email);
-
-    if (
-      !process.env.EMAIL_HOST ||
-      !process.env.EMAIL_PORT ||
-      !process.env.EMAIL_USER ||
-      !process.env.EMAIL_PASS
-    ) {
-      console.error("Missing email environment variables");
-
+    if (!process.env.BREVO_API_KEY || !process.env.EMAIL_FROM) {
       return res.status(500).json({
-        message: "Email service is not configured"
+        message: "Brevo email service is not configured"
       });
     }
 
@@ -79,17 +75,15 @@ exports.sendOtp = async (req, res) => {
 
     await sendMail(email, otp);
 
-    console.log("OTP sent successfully to:", email);
-
     res.json({
       message: "OTP sent to your email"
     });
   } catch (err) {
-    console.error("OTP SEND ERROR:", err);
+    console.error("BREVO OTP ERROR:", err.response?.data || err.message);
 
     res.status(500).json({
       message: "Unable to send OTP",
-      error: err.message
+      error: err.response?.data?.message || err.message
     });
   }
 };
@@ -143,7 +137,7 @@ exports.resetPassword = async (req, res) => {
       message: "Password reset successful"
     });
   } catch (err) {
-    console.error("PASSWORD RESET ERROR:", err);
+    console.error("PASSWORD RESET ERROR:", err.message);
 
     res.status(500).json({
       message: "Password reset failed",
