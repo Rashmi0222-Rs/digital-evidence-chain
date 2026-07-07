@@ -1,9 +1,9 @@
 import { useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Home, LockKeyhole, Mail, KeyRound, ShieldCheck } from "lucide-react";
 import toast from "react-hot-toast";
 
+import API from "../services/api";
 import loginBg from "../assets/login-bg.png";
 import CyberBackground from "../components/CyberBackground";
 import CyberEffects from "../components/CyberEffects";
@@ -28,10 +28,7 @@ function ForgotPassword() {
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        "http://localhost:5000/api/forgot-password/send-otp",
-        { email }
-      );
+      const res = await API.post("/forgot-password/send-otp", { email });
 
       toast.success(res.data.message);
       setStep(2);
@@ -53,14 +50,11 @@ function ForgotPassword() {
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        "http://localhost:5000/api/forgot-password/reset",
-        {
-          email,
-          otp,
-          newPassword
-        }
-      );
+      const res = await API.post("/forgot-password/reset", {
+        email,
+        otp,
+        newPassword
+      });
 
       toast.success(res.data.message);
 
@@ -91,7 +85,7 @@ function ForgotPassword() {
       <button
         type="button"
         onClick={() => navigate("/")}
-        className="fixed top-6 left-6 z-[9999] flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-slate-950/80 px-5 py-3 backdrop-blur-xl hover:bg-cyan-500/20 transition"
+        className="fixed top-4 left-4 md:top-6 md:left-6 z-[9999] flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-slate-950/80 px-4 md:px-5 py-3 backdrop-blur-xl hover:bg-cyan-500/20 transition"
       >
         <Home size={20} />
         Home
@@ -146,16 +140,16 @@ function ForgotPassword() {
           </div>
         </div>
 
-        <div className="flex items-center justify-center p-6">
+        <div className="flex items-center justify-center p-4 md:p-6 pt-24 md:pt-6">
           <form
             onSubmit={step === 1 ? sendOtp : resetPassword}
-            className="w-full max-w-xl rounded-[2rem] border border-cyan-400/30 bg-slate-950/75 backdrop-blur-2xl p-10 shadow-[0_0_70px_rgba(6,182,212,0.25)]"
+            className="w-full max-w-xl rounded-[2rem] border border-cyan-400/30 bg-slate-950/75 backdrop-blur-2xl p-6 md:p-10 shadow-[0_0_70px_rgba(6,182,212,0.25)]"
           >
             <div className="mx-auto mb-5 h-20 w-20 rounded-full bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center shadow-lg shadow-cyan-500/30">
               <LockKeyhole className="text-cyan-300" size={40} />
             </div>
 
-            <h2 className="text-4xl font-extrabold text-center">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-center">
               Forgot <span className="text-purple-400">Password</span>
             </h2>
 
