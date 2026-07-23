@@ -23,7 +23,7 @@ exports.uploadEvidence = async (req, res) => {
       caseId,
       originalName: req.file.originalname,
       fileName: req.file.filename,
-      filePath: req.file.path,
+      filePath: `/uploads/${req.file.filename}`,
       fileType: req.file.mimetype,
       fileSize: req.file.size,
       hash,
