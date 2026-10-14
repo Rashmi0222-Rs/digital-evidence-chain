@@ -1,0 +1,23 @@
+services:
+
+  backend:
+    build:
+      context: ./server
+    container_name: digital-evidence-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server/uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./client
+    container_name: digital-evidence-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    depends_on:
+      - backend

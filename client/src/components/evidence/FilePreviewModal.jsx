@@ -19,7 +19,7 @@ const url =
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-5">
-      <div className="w-full max-w-4xl rounded-3xl bg-slate-950 border border-white/10 p-6">
+     <div className="w-[95vw] h-[92vh] max-w-7xl rounded-3xl bg-slate-950 border border-white/10 p-6 flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-2xl font-bold">{evidence.originalName}</h2>
@@ -33,7 +33,7 @@ const url =
         </div>
 
         {/* Preview */}
-        <div className="rounded-2xl bg-black/40 border border-white/10 p-4 mb-5 max-h-[500px] overflow-auto">
+       <div className="rounded-2xl bg-black border border-white/10 mb-5 h-[70vh] flex items-center justify-center overflow-hidden">
 
           {evidence.fileType?.startsWith("image") && (
             <img
@@ -47,7 +47,7 @@ const url =
             <iframe
               src={url}
               title="PDF Preview"
-              className="w-full h-[450px] rounded-xl"
+             className="max-w-full max-h-full object-contain rounded-xl shadow-2xl"
             />
           )}
 
@@ -81,7 +81,7 @@ const url =
         </div>
 
         {/* Details */}
-        <div className="grid md:grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-white/10 pt-4 text-sm mt-auto">
           <p>
             <b>Status:</b> {evidence.status}
           </p>
